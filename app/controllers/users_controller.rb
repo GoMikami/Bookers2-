@@ -1,6 +1,16 @@
 class UsersController < ApplicationController
 
-def show
+  before_action :authenticate_user!
+  before_action :correct_user,only: [:edit]
+
+
+  def index
+    @user = User.new
+    @users = User.all
+    @book = Book.new
+  end
+
+  def show
     @user = User.find(params[:id])
     @books = @user.books.all
     @book = Book.new
@@ -8,9 +18,6 @@ def show
 
   def edit
     @user = User.find(params[:id])
-    if @user.id != current_user.id
-      redirect_to user_path(current_user.id)
-    end
   end
 
   def update
@@ -23,10 +30,11 @@ def show
     end
   end
 
-  def index
-    @user = User.find(current_user.id)
-    @users = User.all
-    @book = Book.new
+  def correct_user
+    @user = User.find(params[:id])
+    unless @user.id == current_user.id
+      redirect_to user_path(current_user.id)
+    end
   end
 
   private
